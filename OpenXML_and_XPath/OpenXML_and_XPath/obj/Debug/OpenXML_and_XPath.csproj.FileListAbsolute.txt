@@ -1,0 +1,8 @@
+C:\Git\OpenXML_and_XPath\OpenXML_and_XPath\OpenXML_and_XPath\bin\Debug\OpenXML_and_XPath.exe.config
+C:\Git\OpenXML_and_XPath\OpenXML_and_XPath\OpenXML_and_XPath\bin\Debug\OpenXML_and_XPath.exe
+C:\Git\OpenXML_and_XPath\OpenXML_and_XPath\OpenXML_and_XPath\bin\Debug\OpenXML_and_XPath.pdb
+C:\Git\OpenXML_and_XPath\OpenXML_and_XPath\OpenXML_and_XPath\obj\Debug\OpenXML_and_XPath.csprojResolveAssemblyReference.cache
+C:\Git\OpenXML_and_XPath\OpenXML_and_XPath\OpenXML_and_XPath\obj\Debug\OpenXML_and_XPath.Properties.Resources.resources
+C:\Git\OpenXML_and_XPath\OpenXML_and_XPath\OpenXML_and_XPath\obj\Debug\OpenXML_and_XPath.csproj.GenerateResource.Cache
+C:\Git\OpenXML_and_XPath\OpenXML_and_XPath\OpenXML_and_XPath\obj\Debug\OpenXML_and_XPath.exe
+C:\Git\OpenXML_and_XPath\OpenXML_and_XPath\OpenXML_and_XPath\obj\Debug\OpenXML_and_XPath.pdb
