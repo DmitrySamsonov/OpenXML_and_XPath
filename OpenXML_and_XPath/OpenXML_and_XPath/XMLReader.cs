@@ -16,30 +16,12 @@ namespace OpenXML_and_XPath
     {
         private static XMLReader instance = null;
 
-        public string Path { get; set; }
-
         Thread xmlDisplayThread = null;
+
+        public string Path { get; set; }
 
         PrintDataEventHandler printDataXML = null;
         PrintDataEventHandler printDataLog = null;
-
-        protected XMLReader()
-        {
-        }
-
-        //Фабричный метод.
-        public static XMLReader Instance()
-        {
-            //Если объект еще не создан
-            if (instance == null)
-            {
-                //то создаем новый экземпляр
-                instance = new XMLReader();
-            }
-            //Иначе возвращаем ссылку на существующий объект
-            return instance;
-        }
-
 
         public event PrintDataEventHandler PrintDataXML
         {
@@ -51,11 +33,28 @@ namespace OpenXML_and_XPath
             add { if (printDataLog == null) printDataLog += value; }
             remove { printDataLog -= value; }
         }
-        public void PrintDataXMLEvent(string s)
+
+
+        protected XMLReader()
+        {
+        }
+
+        public static XMLReader Instance()
+        {
+            if (instance == null)
+            {
+                instance = new XMLReader();
+            }
+            return instance;
+        }
+
+
+
+        private void PrintDataXMLEvent(string s)
         {
             printDataXML.Invoke(s);
         }
-        public void PrintDataLogEvent(string s)
+        private void PrintDataLogEvent(string s)
         {
             printDataLog.Invoke(s);
         }
@@ -74,24 +73,34 @@ namespace OpenXML_and_XPath
 
         private void Parse()
         {
-            PrintDataLogEvent("XML opening...");
-
-            var document = new XPathDocument(Path);
-            XPathNavigator navigator = document.CreateNavigator();
-
-            XPathExpression expression = navigator.Compile("/");
-
-            XPathNodeIterator iterator = navigator.Select(expression);
-
-
-
-            if (iterator.MoveNext())
+            try
             {
-                XPathNavigator nav2 = iterator.Current.Clone();
-                PrintDataXMLEvent(nav2.OuterXml);
+                PrintDataLogEvent("XML opening...");
+
+                var document = new XPathDocument(Path);
+                XPathNavigator navigator = document.CreateNavigator();
+
+                XPathExpression expression = navigator.Compile("/");
+                XPathNodeIterator iterator = navigator.Select(expression);
+
+                if (iterator.MoveNext())
+                {
+                    XPathNavigator nav2 = iterator.Current.Clone();
+                    PrintDataXMLEvent(nav2.OuterXml);
+                }
+
+                PrintDataLogEvent("");
+            }
+            catch (XmlException xExc)
+            //Exception is thrown is there is an error in the Xml
+            {
+                PrintDataLogEvent(xExc.Message);
+            }
+            catch (Exception ex) //General exception
+            {
+                PrintDataLogEvent(ex.Message);
             }
 
-            PrintDataLogEvent("");
 
 
 

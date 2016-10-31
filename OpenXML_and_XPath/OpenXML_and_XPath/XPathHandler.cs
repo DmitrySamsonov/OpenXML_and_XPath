@@ -16,33 +16,14 @@ namespace OpenXML_and_XPath
     {
         private static XPathHandler instance = null;
 
+        Thread xmlDisplayThread2 = null;
+
         public string Path { get; set; }
         public string XPath { get; set; }
-
-        Thread xmlDisplayThread2 = null;
 
         PrintDataEventHandler printDataResult = null;
         PrintDataEventHandler printDataType = null;
         PrintDataEventHandler printDataLog = null;
-
-
-        protected XPathHandler()
-        {
-        }
-
-        //Фабричный метод.
-        public static XPathHandler Instance()
-        {
-            //Если объект еще не создан
-            if (instance == null)
-            {
-                //то создаем новый экземпляр
-                instance = new XPathHandler();
-            }
-            //Иначе возвращаем ссылку на существующий объект
-            return instance;
-        }
-
 
         public event PrintDataEventHandler PrintDataResult
         {
@@ -60,15 +41,31 @@ namespace OpenXML_and_XPath
             remove { printDataLog -= value; }
         }
 
-        public void PrintDataResultEvent(string s)
+
+        protected XPathHandler()
+        {
+        }
+
+        public static XPathHandler Instance()
+        {
+            if (instance == null)
+            {
+                instance = new XPathHandler();
+            }
+            return instance;
+        }
+        
+       
+
+        private void PrintDataResultEvent(string s)
         {
             printDataResult.Invoke(s);
         }
-        public void PrintDataTypeEvent(string s)
+        private void PrintDataTypeEvent(string s)
         {
             printDataType.Invoke(s);
         }
-        public void PrintDataLogEvent(string s)
+        private void PrintDataLogEvent(string s)
         {
             printDataLog.Invoke(s);
         }
@@ -138,7 +135,6 @@ namespace OpenXML_and_XPath
                 if (XPath != "")
                     PrintDataLogEvent(ex.Message);
             }
-
 
         }
 
