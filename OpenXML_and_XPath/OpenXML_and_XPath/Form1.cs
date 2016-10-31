@@ -15,6 +15,7 @@ namespace OpenXML_and_XPath
 {
     public partial class Form1 : Form
     {
+
         public Form1()
         {
             InitializeComponent();
@@ -22,96 +23,120 @@ namespace OpenXML_and_XPath
 
         private void openXMLFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            openFileDialog1.Filter = "XML files (*.xml)|*.xml";
             if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                string path = openFileDialog1.FileName;
+                XMLReader xmlreader = XMLReader.Instance();
+                xmlreader.Path = openFileDialog1.FileName;
 
+                xmlreader.PrintDataXML += new PrintDataEventHandler(AppendRichBoxShowXML_Handler);
+                xmlreader.PrintDataLog += new PrintDataEventHandler(AppendLogBox_Handler);
 
-                Thread myThread = new Thread(new ParameterizedThreadStart(Method));
-                myThread.Start(path);
+                xmlreader.CreateThread();
             }
         }
 
-        public void AppendTextBox(string value)
+        private void textBoxInputXPath_KeyUp(object sender, KeyEventArgs e)
         {
-            if (InvokeRequired)
-            {
-                this.Invoke(new Action<string>(AppendTextBox), new object[] { value });
-                return;
-            }
-            richTextBox1.AppendText(value);
+            richTextBoxShowResult.Clear();
+            label3.Text = "";
+
+            XPathHandler xpathHandler = XPathHandler.Instance();
+            xpathHandler.Path = openFileDialog1.FileName;
+            xpathHandler.XPath = textBoxInputXPath.Text;
+
+            xpathHandler.PrintDataResult += new PrintDataEventHandler(AppendTextBoxShowResult_Handler);
+            xpathHandler.PrintDataType += new PrintDataEventHandler(AppendLabelBox_Handler);
+            xpathHandler.PrintDataLog += new PrintDataEventHandler(AppendLogBox_Handler);
+
+            xpathHandler.CreateThread();
         }
 
 
-        void Method(object path)
+        public void AppendRichBoxShowXML_Handler(string value)
         {
-            XmlTextReader reader = new XmlTextReader(path.ToString());
-
-            
-            // ignore all white space nodes!!! IT'S FOR QUICKLY !
-            reader.WhitespaceHandling = WhitespaceHandling.None;
-
-
-            while (reader.Read())
+            try
             {
-                switch (reader.NodeType)
+                if (richTextBoxShowXML.InvokeRequired)
                 {
-                    case XmlNodeType.Comment:
-                        //and add the first (root) node
-                        //treeView1.Nodes.Add(new TreeNode(new string(' ', 4 * reader.Depth) + "Comment: " + reader.Name + " " + reader.Value + " + Numb: " + reader.LineNumber + " Pos: " + reader.LocalName));
-                        AppendTextBox(new string('\t', reader.Depth) + "Comment: " + reader.Name + " " + reader.Value + Environment.NewLine);
-                        //richTextBox1.Text += new string('\t', reader.Depth) + "Comment: " + reader.Name + " " + reader.Value + Environment.NewLine;
-                        break;
-
-                    case XmlNodeType.Element:
-                        //and add the first (root) node
-                        //treeView1.Nodes.Add(new TreeNode(/*"7" +*/new string(' ', 4 * reader.Depth) + reader.Name + " + Numb: " + reader.LineNumber + " Pos: " + reader.LocalName));
-                        AppendTextBox( /*"7" +*/new string('\t', reader.Depth) + reader.Name + ":" + Environment.NewLine);
-                        //richTextBox1.Text += /*"7" +*/new string('\t', reader.Depth) + reader.Name + ":" + Environment.NewLine;
-
-
-                        if (reader.HasAttributes)
-                        {
-                            while (reader.MoveToNextAttribute())
-                            {
-                                //and add the first (root) node
-                                //treeView1.Nodes.Add(new TreeNode(new string(' ', 4 * reader.Depth) + "A: " + reader.Name + " " + reader.Value + " + Numb: " + reader.LineNumber + " Pos: " + reader.LocalName));
-                                AppendTextBox( new string('\t', reader.Depth) + "A: " + reader.Name + " " + reader.Value + Environment.NewLine);
-                                //richTextBox1.Text += new string('\t', reader.Depth) + "A: " + reader.Name + " " + reader.Value + Environment.NewLine;
-                            }
-                        }
-
-                        
-                        //TEXT BOX НАКРЫЛСЯ МЕДНЫМ ТАЗИКОМ!
-
-
-                        break;
-
-                    //case XmlNodeType.EndElement:
-                    //    //and add the first (root) node
-                    //    //treeView1.Nodes.Add(new TreeNode("8" + reader.Name + "------DEAPTH:  " + reader.LocalName));
-                    //    //tree_Node = treeNode.PrevNode;
-                    //    break;
-
-                    case XmlNodeType.Text:
-                        //and add the first (root) node
-                        //treeView1.Nodes.Add(new TreeNode(/*"16" +*/new string(' ', 4 * reader.Depth) + reader.Value + " + Numb: " + reader.LineNumber + " Pos: " + reader.LocalName));
-
-                        //tree_Node = treeNode.PrevNode;
-                        //poisk(reader, tree_Node);
-
-                        AppendTextBox(new string('\t', reader.Depth) + reader.Value + Environment.NewLine);
-                        //richTextBox1.Text += new string('\t', reader.Depth) + reader.Value + Environment.NewLine;
-                        break;
-
-                    default:
-                        break;
+                    richTextBoxShowXML.Invoke(new Action<string>(AppendRichBoxShowXML_Handler), new object[] { value });
+                    return;
                 }
-
+                richTextBoxShowXML.AppendText(value);
             }
-
-            
-
+            catch (ThreadInterruptedException)
+            {
+                textBoxLog.Text = "operation was interrupted";
+            }
+            catch (Exception ex) //General exception
+            {
+                textBoxLog.Text = ex.Message;
+            }
         }
+
+        public void AppendTextBoxShowResult_Handler(string value)
+        {
+            try
+            {
+                if (richTextBoxShowResult.InvokeRequired)
+                {
+                    richTextBoxShowResult.Invoke(new Action<string>(AppendTextBoxShowResult_Handler), new object[] { value });
+                    return;
+                }
+                richTextBoxShowResult.AppendText(value);
+            }
+            catch (ThreadInterruptedException)
+            {
+                textBoxLog.Text = "operation was interrupted";
+            }
+            catch (Exception ex) //General exception
+            {
+                textBoxLog.Text = ex.Message;
+            }
+        }
+
+        public void AppendLabelBox_Handler(string value)
+        {
+            try
+            {
+                if (label3.InvokeRequired)
+                {
+                    label3.Invoke(new Action<string>(AppendLabelBox_Handler), new object[] { value });
+                    return;
+                }
+                label3.Text = value;
+                richTextBoxShowResult.Clear();
+            }
+            catch (ThreadInterruptedException)
+            {
+                textBoxLog.Text = "operation was interrupted";
+            }
+            catch (Exception ex) //General exception
+            {
+                textBoxLog.Text = ex.Message;
+            }
+        }
+
+        public void AppendLogBox_Handler(string value)
+        {
+            try
+            {
+                if (label3.InvokeRequired)
+                {
+                    label3.Invoke(new Action<string>(AppendLogBox_Handler), new object[] { value });
+                    return;
+                }
+                textBoxLog.Text = value;
+            }
+            catch (ThreadInterruptedException)
+            {
+                textBoxLog.Text = "operation was interrupted";
+            }
+            catch (Exception ex) //General exception
+            {
+                textBoxLog.Text = ex.Message;
+            }
+        }
+
     }
 }
