@@ -26,6 +26,8 @@ namespace OpenXML_and_XPath
             openFileDialog1.Filter = "XML files (*.xml)|*.xml";
             if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
+                richTextBoxShowXML.Clear();
+
                 XMLReader xmlreader = XMLReader.Instance();
                 xmlreader.Path = openFileDialog1.FileName;
 
